@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Feedback Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(to bottom right, #faf5ff, #fce7f3);
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .container {
+            max-width: 42rem;
+            margin: 2rem auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header-left h1 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .date {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        .export-btn {
+            background: #059669;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .export-btn:hover {
+            background: #047857;
+        }
+        
+        .export-btn.hidden {
+            display: none;
+        }
+        
+        .counter {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        input[type="text"], input[type="email"], textarea {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+        }
+        
+        .rating-section {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .rating-section h3 {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        
+        .rating-group {
+            margin-bottom: 1rem;
+        }
+        
+        .rating-group:last-child {
+            margin-bottom: 0;
+        }
+        
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .rating-header label {
+            margin-bottom: 0;
+        }
+        
+        .rating-value {
+            font-size: 1.125rem;
+            font-weight: bold;
+            color: #9333ea;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 0.5rem;
+            background: #e5e7eb;
+            border-radius: 0.5rem;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 1.25rem;
+            height: 1.25rem;
+            background: #9333ea;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 1.25rem;
+            height: 1.25rem;
+            background: #9333ea;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        button.submit-btn {
+            width: 100%;
+            background: #9333ea;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        button.submit-btn:hover {
+            background: #7e22ce;
+        }
+        
+        button.submit-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+        
+        .success {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        
+        .success-icon {
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1rem;
+            color: #10b981;
+        }
+        
+        .success h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .success p {
+            color: #6b7280;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="header-left">
+                    <h1>Student Feedback</h1>
+                    <p class="date" id="dateDisplay"></p>
+                </div>
+                <button class="export-btn hidden" id="exportBtn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    Export (<span id="exportCount">0</span>)
+                </button>
+            </div>
+            
+            <p class="counter" id="counter">0 feedback entries saved this session</p>
+            
+            <div id="formView">
+                <div class="form-group">
+                    <label>Student Name *</label>
+                    <input type="text" id="name" placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label>My Email (CC) *</label>
+                    <input type="email" id="myEmail" placeholder="your.email@university.edu">
+                </div>
+                
+                <div class="form-group">
+                    <label>Program Director Email *</label>
+                    <input type="email" id="pdEmail" placeholder="director@university.edu">
+                </div>
+                
+                <div class="rating-section">
+                    <h3>Rating Scales (1-10)</h3>
+                    
+                    <div class="rating-group">
+                        <div class="rating-header">
+                            <label>Technical Skills</label>
+                            <span class="rating-value" id="techValue">5</span>
+                        </div>
+                        <input type="range" id="technicalSkills" min="1" max="10" value="5">
+                        <div class="range-labels">
+                            <span>1</span>
+                            <span>10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-group">
+                        <div class="rating-header">
+                            <label>Humility</label>
+                            <span class="rating-value" id="humilityValue">5</span>
+                        </div>
+                        <input type="range" id="humility" min="1" max="10" value="5">
+                        <div class="range-labels">
+                            <span>1</span>
+                            <span>10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-group">
+                        <div class="rating-header">
+                            <label>Culture Fit</label>
+                            <span class="rating-value" id="cultureFitValue">5</span>
+                        </div>
+                        <input type="range" id="cultureFit" min="1" max="10" value="5">
+                        <div class="range-labels">
+                            <span>1</span>
+                            <span>10</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Strengths *</label>
+                    <textarea id="strengths" rows="4" placeholder="What did they do well?"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Opportunities for Improvement *</label>
+                    <textarea id="improvements" rows="4" placeholder="What could be better next time?"></textarea>
+                </div>
+                
+                <button class="submit-btn" id="submitBtn" disabled>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    Send Feedback via Email
+                </button>
+            </div>
+            
+            <div id="successView" class="success hidden">
+                <svg class="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h2>Feedback Sent!</h2>
+                <p>Your email client should open with the feedback ready to send.</p>
+            </div>
+        </div>
+        
+        <p class="footer">Feedback is saved automatically • Click Export to download Excel file</p>
+    </div>
+
+    <script>
+        // Feedback history storage
+        let feedbackHistory = [];
+        
+        // Display today's date
+        const today = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        document.getElementById('dateDisplay').textContent = 'Date: ' + today;
+        
+        // Get form elements
+        const nameInput = document.getElementById('name');
+        const myEmailInput = document.getElementById('myEmail');
+        const pdEmailInput = document.getElementById('pdEmail');
+        const technicalSkillsInput = document.getElementById('technicalSkills');
+        const humilityInput = document.getElementById('humility');
+        const cultureFitInput = document.getElementById('cultureFit');
+        const strengthsInput = document.getElementById('strengths');
+        const improvementsInput = document.getElementById('improvements');
+        const submitBtn = document.getElementById('submitBtn');
+        const formView = document.getElementById('formView');
+        const successView = document.getElementById('successView');
+        const exportBtn = document.getElementById('exportBtn');
+        const exportCount = document.getElementById('exportCount');
+        const counter = document.getElementById('counter');
+        
+        // Rating value displays
+        const techValue = document.getElementById('techValue');
+        const humilityValue = document.getElementById('humilityValue');
+        const cultureFitValue = document.getElementById('cultureFitValue');
+        
+        // Update rating displays
+        technicalSkillsInput.addEventListener('input', function() {
+            techValue.textContent = this.value;
+        });
+        
+        humilityInput.addEventListener('input', function() {
+            humilityValue.textContent = this.value;
+        });
+        
+        cultureFitInput.addEventListener('input', function() {
+            cultureFitValue.textContent = this.value;
+        });
+        
+        // Update counter display
+        function updateCounter() {
+            const count = feedbackHistory.length;
+            counter.textContent = `${count} feedback ${count === 1 ? 'entry' : 'entries'} saved this session`;
+            exportCount.textContent = count;
+            
+            if (count > 0) {
+                exportBtn.classList.remove('hidden');
+            } else {
+                exportBtn.classList.add('hidden');
+            }
+        }
+        
+        // Validate form
+        function validateForm() {
+            const isValid = nameInput.value && 
+                          myEmailInput.value && 
+                          pdEmailInput.value && 
+                          strengthsInput.value && 
+                          improvementsInput.value;
+            submitBtn.disabled = !isValid;
+        }
+        
+        // Add event listeners
+        [nameInput, myEmailInput, pdEmailInput, strengthsInput, improvementsInput].forEach(input => {
+            input.addEventListener('input', validateForm);
+        });
+        
+        // Handle submit
+        submitBtn.addEventListener('click', function() {
+            // Save to history
+            feedbackHistory.push({
+                date: today,
+                name: nameInput.value,
+                technicalSkills: technicalSkillsInput.value,
+                humility: humilityInput.value,
+                cultureFit: cultureFitInput.value,
+                strengths: strengthsInput.value,
+                improvements: improvementsInput.value
+            });
+            
+            updateCounter();
+            
+            const subject = encodeURIComponent(`Student Feedback - ${nameInput.value} - ${today}`);
+            const body = encodeURIComponent(`STUDENT FEEDBACK
+
+Date: ${today}
+Student: ${nameInput.value}
+
+RATINGS (1-10 scale):
+Technical Skills: ${technicalSkillsInput.value}/10
+Humility: ${humilityInput.value}/10
+Culture Fit: ${cultureFitInput.value}/10
+
+STRENGTHS:
+${strengthsInput.value}
+
+OPPORTUNITIES FOR IMPROVEMENT:
+${improvementsInput.value}
+
+---
+This feedback was generated via mobile feedback tracker.`);
+            
+            // Open email client
+            window.location.href = `mailto:${pdEmailInput.value}?cc=${myEmailInput.value}&subject=${subject}&body=${body}`;
+            
+            // Show success message
+            formView.classList.add('hidden');
+            successView.classList.remove('hidden');
+            
+            // Reset form after 3 seconds
+            setTimeout(function() {
+                nameInput.value = '';
+                myEmailInput.value = '';
+                pdEmailInput.value = '';
+                technicalSkillsInput.value = 5;
+                humilityInput.value = 5;
+                cultureFitInput.value = 5;
+                techValue.textContent = 5;
+                humilityValue.textContent = 5;
+                cultureFitValue.textContent = 5;
+                strengthsInput.value = '';
+                improvementsInput.value = '';
+                formView.classList.remove('hidden');
+                successView.classList.add('hidden');
+                validateForm();
+            }, 3000);
+        });
+        
+        // Handle Excel export
+        exportBtn.addEventListener('click', function() {
+            if (feedbackHistory.length === 0) {
+                alert('No feedback entries to download yet!');
+                return;
+            }
+            
+            // Prepare data for Excel
+            const excelData = feedbackHistory.map(entry => ({
+                'Date': entry.date,
+                'Student Name': entry.name,
+                'Technical Skills (1-10)': entry.technicalSkills,
+                'Humility (1-10)': entry.humility,
+                'Culture Fit (1-10)': entry.cultureFit,
+                'Strengths': entry.strengths,
+                'Opportunities for Improvement': entry.improvements
+            }));
+            
+            // Create workbook and worksheet
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Feedback');
+            
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 15 }, // Date
+                { wch: 20 }, // Name
+                { wch: 20 }, // Technical Skills
+                { wch: 15 }, // Humility
+                { wch: 15 }, // Culture Fit
+                { wch: 50 }, // Strengths
+                { wch: 50 }  // Improvements
+            ];
+            
+            // Download
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `Student_Feedback_${dateStr}.xlsx`);
+        });
+    </script>
+</body>
+</html>
