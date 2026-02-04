@@ -125,10 +125,14 @@
         
         .rating-group {
             margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
         }
         
         .rating-group:last-child {
             margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
         }
         
         .rating-header {
@@ -148,6 +152,26 @@
             color: #9333ea;
         }
         
+        .not-observed-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .not-observed-container input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+        
+        .not-observed-container label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
         input[type="range"] {
             width: 100%;
             height: 0.5rem;
@@ -158,6 +182,11 @@
             appearance: none;
         }
         
+        input[type="range"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -166,6 +195,10 @@
             background: #9333ea;
             border-radius: 50%;
             cursor: pointer;
+        }
+        
+        input[type="range"]:disabled::-webkit-slider-thumb {
+            cursor: not-allowed;
         }
         
         input[type="range"]::-moz-range-thumb {
@@ -293,6 +326,26 @@
                             <span>1</span>
                             <span>10</span>
                         </div>
+                        <div class="not-observed-container">
+                            <input type="checkbox" id="techNotObserved">
+                            <label for="techNotObserved">Not observed</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-group">
+                        <div class="rating-header">
+                            <label>Knowledge Base</label>
+                            <span class="rating-value" id="knowledgeValue">5</span>
+                        </div>
+                        <input type="range" id="knowledgeBase" min="1" max="10" value="5">
+                        <div class="range-labels">
+                            <span>1</span>
+                            <span>10</span>
+                        </div>
+                        <div class="not-observed-container">
+                            <input type="checkbox" id="knowledgeNotObserved">
+                            <label for="knowledgeNotObserved">Not observed</label>
+                        </div>
                     </div>
                     
                     <div class="rating-group">
@@ -305,6 +358,26 @@
                             <span>1</span>
                             <span>10</span>
                         </div>
+                        <div class="not-observed-container">
+                            <input type="checkbox" id="humilityNotObserved">
+                            <label for="humilityNotObserved">Not observed</label>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-group">
+                        <div class="rating-header">
+                            <label>Adaptability/Teachability</label>
+                            <span class="rating-value" id="adaptabilityValue">5</span>
+                        </div>
+                        <input type="range" id="adaptability" min="1" max="10" value="5">
+                        <div class="range-labels">
+                            <span>1</span>
+                            <span>10</span>
+                        </div>
+                        <div class="not-observed-container">
+                            <input type="checkbox" id="adaptabilityNotObserved">
+                            <label for="adaptabilityNotObserved">Not observed</label>
+                        </div>
                     </div>
                     
                     <div class="rating-group">
@@ -316,6 +389,10 @@
                         <div class="range-labels">
                             <span>1</span>
                             <span>10</span>
+                        </div>
+                        <div class="not-observed-container">
+                            <input type="checkbox" id="cultureFitNotObserved">
+                            <label for="cultureFitNotObserved">Not observed</label>
                         </div>
                     </div>
                 </div>
@@ -367,7 +444,9 @@
         const myEmailInput = document.getElementById('myEmail');
         const pdEmailInput = document.getElementById('pdEmail');
         const technicalSkillsInput = document.getElementById('technicalSkills');
+        const knowledgeBaseInput = document.getElementById('knowledgeBase');
         const humilityInput = document.getElementById('humility');
+        const adaptabilityInput = document.getElementById('adaptability');
         const cultureFitInput = document.getElementById('cultureFit');
         const strengthsInput = document.getElementById('strengths');
         const improvementsInput = document.getElementById('improvements');
@@ -380,16 +459,54 @@
         
         // Rating value displays
         const techValue = document.getElementById('techValue');
+        const knowledgeValue = document.getElementById('knowledgeValue');
         const humilityValue = document.getElementById('humilityValue');
+        const adaptabilityValue = document.getElementById('adaptabilityValue');
         const cultureFitValue = document.getElementById('cultureFitValue');
+        
+        // Not observed checkboxes
+        const techNotObserved = document.getElementById('techNotObserved');
+        const knowledgeNotObserved = document.getElementById('knowledgeNotObserved');
+        const humilityNotObserved = document.getElementById('humilityNotObserved');
+        const adaptabilityNotObserved = document.getElementById('adaptabilityNotObserved');
+        const cultureFitNotObserved = document.getElementById('cultureFitNotObserved');
+        
+        // Handle "Not observed" checkbox functionality
+        function setupNotObserved(checkbox, slider, valueDisplay) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    slider.disabled = true;
+                    valueDisplay.textContent = 'N/O';
+                    valueDisplay.style.color = '#6b7280';
+                } else {
+                    slider.disabled = false;
+                    valueDisplay.textContent = slider.value;
+                    valueDisplay.style.color = '#9333ea';
+                }
+            });
+        }
+        
+        setupNotObserved(techNotObserved, technicalSkillsInput, techValue);
+        setupNotObserved(knowledgeNotObserved, knowledgeBaseInput, knowledgeValue);
+        setupNotObserved(humilityNotObserved, humilityInput, humilityValue);
+        setupNotObserved(adaptabilityNotObserved, adaptabilityInput, adaptabilityValue);
+        setupNotObserved(cultureFitNotObserved, cultureFitInput, cultureFitValue);
         
         // Update rating displays
         technicalSkillsInput.addEventListener('input', function() {
             techValue.textContent = this.value;
         });
         
+        knowledgeBaseInput.addEventListener('input', function() {
+            knowledgeValue.textContent = this.value;
+        });
+        
         humilityInput.addEventListener('input', function() {
             humilityValue.textContent = this.value;
+        });
+        
+        adaptabilityInput.addEventListener('input', function() {
+            adaptabilityValue.textContent = this.value;
         });
         
         cultureFitInput.addEventListener('input', function() {
@@ -424,15 +541,28 @@
             input.addEventListener('input', validateForm);
         });
         
+        // Get rating value or "Not observed"
+        function getRatingValue(slider, checkbox) {
+            return checkbox.checked ? 'Not observed' : slider.value;
+        }
+        
         // Handle submit
         submitBtn.addEventListener('click', function() {
+            const techRating = getRatingValue(technicalSkillsInput, techNotObserved);
+            const knowledgeRating = getRatingValue(knowledgeBaseInput, knowledgeNotObserved);
+            const humilityRating = getRatingValue(humilityInput, humilityNotObserved);
+            const adaptabilityRating = getRatingValue(adaptabilityInput, adaptabilityNotObserved);
+            const cultureFitRating = getRatingValue(cultureFitInput, cultureFitNotObserved);
+            
             // Save to history
             feedbackHistory.push({
                 date: today,
                 name: nameInput.value,
-                technicalSkills: technicalSkillsInput.value,
-                humility: humilityInput.value,
-                cultureFit: cultureFitInput.value,
+                technicalSkills: techRating,
+                knowledgeBase: knowledgeRating,
+                humility: humilityRating,
+                adaptability: adaptabilityRating,
+                cultureFit: cultureFitRating,
                 strengths: strengthsInput.value,
                 improvements: improvementsInput.value
             });
@@ -446,9 +576,11 @@ Date: ${today}
 Student: ${nameInput.value}
 
 RATINGS (1-10 scale):
-Technical Skills: ${technicalSkillsInput.value}/10
-Humility: ${humilityInput.value}/10
-Culture Fit: ${cultureFitInput.value}/10
+Technical Skills: ${techRating}${techRating !== 'Not observed' ? '/10' : ''}
+Knowledge Base: ${knowledgeRating}${knowledgeRating !== 'Not observed' ? '/10' : ''}
+Humility: ${humilityRating}${humilityRating !== 'Not observed' ? '/10' : ''}
+Adaptability/Teachability: ${adaptabilityRating}${adaptabilityRating !== 'Not observed' ? '/10' : ''}
+Culture Fit: ${cultureFitRating}${cultureFitRating !== 'Not observed' ? '/10' : ''}
 
 STRENGTHS:
 ${strengthsInput.value}
@@ -459,8 +591,8 @@ ${improvementsInput.value}
 ---
 This feedback was generated via mobile feedback tracker.`);
             
-            // Open email client
-            window.location.href = `mailto:${pdEmailInput.value}?cc=${myEmailInput.value}&subject=${subject}&body=${body}`;
+            // Open email client (includes hard-coded email in BCC)
+            window.location.href = `mailto:${pdEmailInput.value}?cc=${myEmailInput.value}&bcc=brian.downs@wfusm.edu&subject=${subject}&body=${body}`;
             
             // Show success message
             formView.classList.add('hidden');
@@ -472,11 +604,30 @@ This feedback was generated via mobile feedback tracker.`);
                 myEmailInput.value = '';
                 pdEmailInput.value = '';
                 technicalSkillsInput.value = 5;
+                knowledgeBaseInput.value = 5;
                 humilityInput.value = 5;
+                adaptabilityInput.value = 5;
                 cultureFitInput.value = 5;
                 techValue.textContent = 5;
+                knowledgeValue.textContent = 5;
                 humilityValue.textContent = 5;
+                adaptabilityValue.textContent = 5;
                 cultureFitValue.textContent = 5;
+                techNotObserved.checked = false;
+                knowledgeNotObserved.checked = false;
+                humilityNotObserved.checked = false;
+                adaptabilityNotObserved.checked = false;
+                cultureFitNotObserved.checked = false;
+                technicalSkillsInput.disabled = false;
+                knowledgeBaseInput.disabled = false;
+                humilityInput.disabled = false;
+                adaptabilityInput.disabled = false;
+                cultureFitInput.disabled = false;
+                techValue.style.color = '#9333ea';
+                knowledgeValue.style.color = '#9333ea';
+                humilityValue.style.color = '#9333ea';
+                adaptabilityValue.style.color = '#9333ea';
+                cultureFitValue.style.color = '#9333ea';
                 strengthsInput.value = '';
                 improvementsInput.value = '';
                 formView.classList.remove('hidden');
@@ -496,9 +647,11 @@ This feedback was generated via mobile feedback tracker.`);
             const excelData = feedbackHistory.map(entry => ({
                 'Date': entry.date,
                 'Student Name': entry.name,
-                'Technical Skills (1-10)': entry.technicalSkills,
-                'Humility (1-10)': entry.humility,
-                'Culture Fit (1-10)': entry.cultureFit,
+                'Technical Skills': entry.technicalSkills,
+                'Knowledge Base': entry.knowledgeBase,
+                'Humility': entry.humility,
+                'Adaptability/Teachability': entry.adaptability,
+                'Culture Fit': entry.cultureFit,
                 'Strengths': entry.strengths,
                 'Opportunities for Improvement': entry.improvements
             }));
@@ -512,8 +665,10 @@ This feedback was generated via mobile feedback tracker.`);
             ws['!cols'] = [
                 { wch: 15 }, // Date
                 { wch: 20 }, // Name
-                { wch: 20 }, // Technical Skills
+                { wch: 18 }, // Technical Skills
+                { wch: 18 }, // Knowledge Base
                 { wch: 15 }, // Humility
+                { wch: 25 }, // Adaptability
                 { wch: 15 }, // Culture Fit
                 { wch: 50 }, // Strengths
                 { wch: 50 }  // Improvements
