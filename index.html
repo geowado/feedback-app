@@ -14,7 +14,7 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(to bottom right, #faf5ff, #fce7f3);
+            background: linear-gradient(to bottom right, #fef3c7, #fbbf24);
             min-height: 100vh;
             padding: 1rem;
         }
@@ -149,7 +149,7 @@
         .rating-value {
             font-size: 1.125rem;
             font-weight: bold;
-            color: #9333ea;
+            color: #000000;
         }
         
         .not-observed-container {
@@ -192,7 +192,7 @@
             appearance: none;
             width: 1.25rem;
             height: 1.25rem;
-            background: #9333ea;
+            background: #000000;
             border-radius: 50%;
             cursor: pointer;
         }
@@ -204,7 +204,7 @@
         input[type="range"]::-moz-range-thumb {
             width: 1.25rem;
             height: 1.25rem;
-            background: #9333ea;
+            background: #000000;
             border-radius: 50%;
             cursor: pointer;
             border: none;
@@ -304,13 +304,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>My Email (CC) *</label>
+                    <label>My Email *</label>
                     <input type="email" id="myEmail" placeholder="your.email@university.edu">
-                </div>
-                
-                <div class="form-group">
-                    <label>Program Director Email *</label>
-                    <input type="email" id="pdEmail" placeholder="director@university.edu">
                 </div>
                 
                 <div class="rating-section">
@@ -442,7 +437,7 @@
         // Get form elements
         const nameInput = document.getElementById('name');
         const myEmailInput = document.getElementById('myEmail');
-        const pdEmailInput = document.getElementById('pdEmail');
+        const strengthsInput = document.getElementById('strengths');
         const technicalSkillsInput = document.getElementById('technicalSkills');
         const knowledgeBaseInput = document.getElementById('knowledgeBase');
         const humilityInput = document.getElementById('humility');
@@ -481,7 +476,7 @@
                 } else {
                     slider.disabled = false;
                     valueDisplay.textContent = slider.value;
-                    valueDisplay.style.color = '#9333ea';
+                    valueDisplay.style.color = '#000000';
                 }
             });
         }
@@ -530,14 +525,13 @@
         function validateForm() {
             const isValid = nameInput.value && 
                           myEmailInput.value && 
-                          pdEmailInput.value && 
                           strengthsInput.value && 
                           improvementsInput.value;
             submitBtn.disabled = !isValid;
         }
         
         // Add event listeners
-        [nameInput, myEmailInput, pdEmailInput, strengthsInput, improvementsInput].forEach(input => {
+        [nameInput, myEmailInput, strengthsInput, improvementsInput].forEach(input => {
             input.addEventListener('input', validateForm);
         });
         
@@ -591,8 +585,8 @@ ${improvementsInput.value}
 ---
 This feedback was generated via mobile feedback tracker.`);
             
-            // Open email client (includes hard-coded email in BCC)
-            window.location.href = `mailto:${pdEmailInput.value}?cc=${myEmailInput.value}&bcc=brian.downs@wfusm.edu&subject=${subject}&body=${body}`;
+            // Open email client (BCCs automatically added)
+            window.location.href = `mailto:${myEmailInput.value}?bcc=Drew.Plonk@advocatehealth.org,Eleanor.Kiell@wfusm.edu&subject=${subject}&body=${body}`;
             
             // Show success message
             formView.classList.add('hidden');
@@ -602,7 +596,6 @@ This feedback was generated via mobile feedback tracker.`);
             setTimeout(function() {
                 nameInput.value = '';
                 myEmailInput.value = '';
-                pdEmailInput.value = '';
                 technicalSkillsInput.value = 5;
                 knowledgeBaseInput.value = 5;
                 humilityInput.value = 5;
@@ -623,11 +616,11 @@ This feedback was generated via mobile feedback tracker.`);
                 humilityInput.disabled = false;
                 adaptabilityInput.disabled = false;
                 cultureFitInput.disabled = false;
-                techValue.style.color = '#9333ea';
-                knowledgeValue.style.color = '#9333ea';
-                humilityValue.style.color = '#9333ea';
-                adaptabilityValue.style.color = '#9333ea';
-                cultureFitValue.style.color = '#9333ea';
+                techValue.style.color = '#000000';
+                knowledgeValue.style.color = '#000000';
+                humilityValue.style.color = '#000000';
+                adaptabilityValue.style.color = '#000000';
+                cultureFitValue.style.color = '#000000';
                 strengthsInput.value = '';
                 improvementsInput.value = '';
                 formView.classList.remove('hidden');
