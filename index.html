@@ -101,8 +101,8 @@
         
         input:focus, textarea:focus {
             outline: none;
-            border-color: #9333ea;
-            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+            border-color: #ca8a04;
+            box-shadow: 0 0 0 3px rgba(202, 138, 4, 0.1);
         }
         
         textarea {
@@ -164,6 +164,7 @@
             width: 1rem;
             height: 1rem;
             cursor: pointer;
+            accent-color: #000000;
         }
         
         .not-observed-container label {
@@ -220,7 +221,7 @@
         
         button.submit-btn {
             width: 100%;
-            background: #9333ea;
+            background: #000000;
             color: white;
             padding: 0.75rem 1.5rem;
             border: none;
@@ -228,15 +229,11 @@
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
             transition: background 0.2s;
         }
         
         button.submit-btn:hover {
-            background: #7e22ce;
+            background: #1f2937;
         }
         
         button.submit-btn:disabled {
@@ -272,6 +269,7 @@
             font-size: 0.875rem;
             color: #6b7280;
             margin-top: 1rem;
+            opacity: 0.6;
         }
         
         .hidden {
@@ -402,12 +400,7 @@
                     <textarea id="improvements" rows="4" placeholder="What could be better next time?"></textarea>
                 </div>
                 
-                <button class="submit-btn" id="submitBtn" disabled>
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
-                    Send Feedback via Email
-                </button>
+                <button class="submit-btn" id="submitBtn" disabled>Submit Feedback</button>
             </div>
             
             <div id="successView" class="success hidden">
@@ -420,7 +413,6 @@
         </div>
         
         <p class="footer">Feedback is saved automatically • Click Export to download Excel file</p>
-        <p class="footer" style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.6;">Built by Brian Downs</p>
     </div>
 
     <script>
@@ -438,7 +430,6 @@
         // Get form elements
         const nameInput = document.getElementById('name');
         const myEmailInput = document.getElementById('myEmail');
-        const strengthsInput = document.getElementById('strengths');
         const technicalSkillsInput = document.getElementById('technicalSkills');
         const knowledgeBaseInput = document.getElementById('knowledgeBase');
         const humilityInput = document.getElementById('humility');
@@ -488,31 +479,41 @@
         setupNotObserved(adaptabilityNotObserved, adaptabilityInput, adaptabilityValue);
         setupNotObserved(cultureFitNotObserved, cultureFitInput, cultureFitValue);
         
-        // Update rating displays
+        // Update rating displays when sliders move
         technicalSkillsInput.addEventListener('input', function() {
-            techValue.textContent = this.value;
+            if (!techNotObserved.checked) {
+                techValue.textContent = this.value;
+            }
         });
         
         knowledgeBaseInput.addEventListener('input', function() {
-            knowledgeValue.textContent = this.value;
+            if (!knowledgeNotObserved.checked) {
+                knowledgeValue.textContent = this.value;
+            }
         });
         
         humilityInput.addEventListener('input', function() {
-            humilityValue.textContent = this.value;
+            if (!humilityNotObserved.checked) {
+                humilityValue.textContent = this.value;
+            }
         });
         
         adaptabilityInput.addEventListener('input', function() {
-            adaptabilityValue.textContent = this.value;
+            if (!adaptabilityNotObserved.checked) {
+                adaptabilityValue.textContent = this.value;
+            }
         });
         
         cultureFitInput.addEventListener('input', function() {
-            cultureFitValue.textContent = this.value;
+            if (!cultureFitNotObserved.checked) {
+                cultureFitValue.textContent = this.value;
+            }
         });
         
         // Update counter display
         function updateCounter() {
             const count = feedbackHistory.length;
-            counter.textContent = `${count} feedback ${count === 1 ? 'entry' : 'entries'} saved this session`;
+            counter.textContent = count + ' feedback ' + (count === 1 ? 'entry' : 'entries') + ' saved this session';
             exportCount.textContent = count;
             
             if (count > 0) {
@@ -531,10 +532,11 @@
             submitBtn.disabled = !isValid;
         }
         
-        // Add event listeners
-        [nameInput, myEmailInput, strengthsInput, improvementsInput].forEach(input => {
-            input.addEventListener('input', validateForm);
-        });
+        // Add event listeners for validation
+        nameInput.addEventListener('input', validateForm);
+        myEmailInput.addEventListener('input', validateForm);
+        strengthsInput.addEventListener('input', validateForm);
+        improvementsInput.addEventListener('input', validateForm);
         
         // Get rating value or "Not observed"
         function getRatingValue(slider, checkbox) {
@@ -564,30 +566,11 @@
             
             updateCounter();
             
-            const subject = encodeURIComponent(`Student Feedback - ${nameInput.value} - ${today}`);
-            const body = encodeURIComponent(`STUDENT FEEDBACK
-
-Date: ${today}
-Student: ${nameInput.value}
-
-RATINGS (1-10 scale):
-Technical Skills: ${techRating}${techRating !== 'Not observed' ? '/10' : ''}
-Knowledge Base: ${knowledgeRating}${knowledgeRating !== 'Not observed' ? '/10' : ''}
-Humility: ${humilityRating}${humilityRating !== 'Not observed' ? '/10' : ''}
-Adaptability/Teachability: ${adaptabilityRating}${adaptabilityRating !== 'Not observed' ? '/10' : ''}
-Culture Fit: ${cultureFitRating}${cultureFitRating !== 'Not observed' ? '/10' : ''}
-
-STRENGTHS:
-${strengthsInput.value}
-
-OPPORTUNITIES FOR IMPROVEMENT:
-${improvementsInput.value}
-
----
-This feedback was generated via mobile feedback tracker.`);
+            const subject = encodeURIComponent('Student Feedback - ' + nameInput.value + ' - ' + today);
+            const body = encodeURIComponent('STUDENT FEEDBACK\n\nDate: ' + today + '\nStudent: ' + nameInput.value + '\n\nRATINGS (1-10 scale):\nTechnical Skills: ' + techRating + (techRating !== 'Not observed' ? '/10' : '') + '\nKnowledge Base: ' + knowledgeRating + (knowledgeRating !== 'Not observed' ? '/10' : '') + '\nHumility: ' + humilityRating + (humilityRating !== 'Not observed' ? '/10' : '') + '\nAdaptability/Teachability: ' + adaptabilityRating + (adaptabilityRating !== 'Not observed' ? '/10' : '') + '\nCulture Fit: ' + cultureFitRating + (cultureFitRating !== 'Not observed' ? '/10' : '') + '\n\nSTRENGTHS:\n' + strengthsInput.value + '\n\nOPPORTUNITIES FOR IMPROVEMENT:\n' + improvementsInput.value + '\n\n---\nThis feedback was generated via mobile feedback tracker.');
             
-            // Open email client (BCCs automatically added)
-            window.location.href = `mailto:${myEmailInput.value}?bcc=Drew.Plonk@advocatehealth.org,Eleanor.Kiell@wfusm.edu&subject=${subject}&body=${body}`;
+            // Open email client
+            window.location.href = 'mailto:?bcc=Drew.Plonk@advocatehealth.org,Eleanor.Kiell@wfusm.edu&subject=' + subject + '&body=' + body;
             
             // Show success message
             formView.classList.add('hidden');
@@ -638,17 +621,19 @@ This feedback was generated via mobile feedback tracker.`);
             }
             
             // Prepare data for Excel
-            const excelData = feedbackHistory.map(entry => ({
-                'Date': entry.date,
-                'Student Name': entry.name,
-                'Technical Skills': entry.technicalSkills,
-                'Knowledge Base': entry.knowledgeBase,
-                'Humility': entry.humility,
-                'Adaptability/Teachability': entry.adaptability,
-                'Culture Fit': entry.cultureFit,
-                'Strengths': entry.strengths,
-                'Opportunities for Improvement': entry.improvements
-            }));
+            const excelData = feedbackHistory.map(function(entry) {
+                return {
+                    'Date': entry.date,
+                    'Student Name': entry.name,
+                    'Technical Skills': entry.technicalSkills,
+                    'Knowledge Base': entry.knowledgeBase,
+                    'Humility': entry.humility,
+                    'Adaptability/Teachability': entry.adaptability,
+                    'Culture Fit': entry.cultureFit,
+                    'Strengths': entry.strengths,
+                    'Opportunities for Improvement': entry.improvements
+                };
+            });
             
             // Create workbook and worksheet
             const ws = XLSX.utils.json_to_sheet(excelData);
@@ -670,7 +655,7 @@ This feedback was generated via mobile feedback tracker.`);
             
             // Download
             const dateStr = new Date().toISOString().split('T')[0];
-            XLSX.writeFile(wb, `Student_Feedback_${dateStr}.xlsx`);
+            XLSX.writeFile(wb, 'Student_Feedback_' + dateStr + '.xlsx');
         });
     </script>
 </body>
